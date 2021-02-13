@@ -1,6 +1,6 @@
 import io
 
-from lpython.tokeniser import Lex, Token, TokenKind, NONE
+from lpython.tokeniser import Lex, TokenKind, EOF_MAGIC, NONE
 
 
 def lex(code):
@@ -47,9 +47,29 @@ def test_assignment():
     asg = lex("myVar = value;")
     assert(len(asg) == 4)
     assert(asg[0].kind == TokenKind.UNINTERESTING and
-           asg[0].value == "myVar ")
+           asg[0].value == "myVar " and
+           asg[0].position == 0)
     assert(asg[1].kind == TokenKind.UNINTERESTING and
-           asg[1].value == "= ")
+           asg[1].value == "= " and
+           asg[1].position == 6)
     assert(asg[2].kind == TokenKind.UNINTERESTING and
-           asg[2].value == "value")
-    assert(asg[3].kind == TokenKind.SEMI and asg[3].value == ";")
+           asg[2].value == "value" and
+           asg[2].position == 8)
+    assert(asg[3].kind == TokenKind.SEMI and asg[3].value == ";" and
+           asg[3].position == 13)
+
+
+def test_parens():
+    assert(toks("if foo(bar):") == [TokenKind.IF,
+                                    TokenKind.UNINTERESTING,
+                                    TokenKind.OPEN,
+                                    TokenKind.UNINTERESTING,
+                                    TokenKind.CLOSE,
+                                    TokenKind.COLON])
+
+
+def test_eof():
+    empty = io.StringIO("")
+    eof = Lex(empty).next()
+    assert(empty.getvalue() == EOF_MAGIC)
+    assert(eof.kind == TokenKind.EOF and eof.position == 0)
