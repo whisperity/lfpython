@@ -25,34 +25,34 @@ def toks(code):
 
 def test_simple_words():
     assert(toks("") == [])
-    assert(toks("import json") == [TokenKind.UNINTERESTING,
-                                   TokenKind.UNINTERESTING])
-    assert(toks("import json; import time;") == [TokenKind.UNINTERESTING,
-                                                 TokenKind.UNINTERESTING,
+    assert(toks("import json") == [TokenKind.VERBATIM,
+                                   TokenKind.VERBATIM])
+    assert(toks("import json; import time;") == [TokenKind.VERBATIM,
+                                                 TokenKind.VERBATIM,
                                                  TokenKind.SEMI,
-                                                 TokenKind.UNINTERESTING,
-                                                 TokenKind.UNINTERESTING,
+                                                 TokenKind.VERBATIM,
+                                                 TokenKind.VERBATIM,
                                                  TokenKind.SEMI])
 
 
 def test_keywords():
     assert(toks("if X:") == [TokenKind.IF,
-                             TokenKind.UNINTERESTING,
+                             TokenKind.VERBATIM,
                              TokenKind.COLON])
 
-    assert(toks("ifIam") == [TokenKind.UNINTERESTING])
+    assert(toks("ifIam") == [TokenKind.VERBATIM])
 
 
 def test_assignment():
     asg = lex("myVar = value;")
     assert(len(asg) == 4)
-    assert(asg[0].kind == TokenKind.UNINTERESTING and
+    assert(asg[0].kind == TokenKind.VERBATIM and
            asg[0].value == "myVar " and
            asg[0].position == 0)
-    assert(asg[1].kind == TokenKind.UNINTERESTING and
+    assert(asg[1].kind == TokenKind.VERBATIM and
            asg[1].value == "= " and
            asg[1].position == 6)
-    assert(asg[2].kind == TokenKind.UNINTERESTING and
+    assert(asg[2].kind == TokenKind.VERBATIM and
            asg[2].value == "value" and
            asg[2].position == 8)
     assert(asg[3].kind == TokenKind.SEMI and asg[3].value == ";" and
@@ -61,24 +61,24 @@ def test_assignment():
 
 def test_parens():
     assert(toks("if foo(bar):") == [TokenKind.IF,
-                                    TokenKind.UNINTERESTING,
+                                    TokenKind.VERBATIM,
                                     TokenKind.OPEN,
-                                    TokenKind.UNINTERESTING,
+                                    TokenKind.VERBATIM,
                                     TokenKind.CLOSE,
                                     TokenKind.COLON])
 
 
 def test_string_concat():
     assert(toks("input(\"Foo\" + x + \":\");") == [
-        TokenKind.UNINTERESTING,  # input
+        TokenKind.VERBATIM,  # input
         TokenKind.OPEN,           # (
-        TokenKind.UNINTERESTING,  # "Foo" (+ ws)
-        TokenKind.UNINTERESTING,  # +     (+ ws)
-        TokenKind.UNINTERESTING,  # x     (+ ws)
-        TokenKind.UNINTERESTING,  # +     (+ ws)
-        TokenKind.UNINTERESTING,  # "
+        TokenKind.VERBATIM,  # "Foo" (+ ws)
+        TokenKind.VERBATIM,  # +     (+ ws)
+        TokenKind.VERBATIM,  # x     (+ ws)
+        TokenKind.VERBATIM,  # +     (+ ws)
+        TokenKind.VERBATIM,  # "
         TokenKind.COLON,          # :
-        TokenKind.UNINTERESTING,  # "
+        TokenKind.VERBATIM,  # "
         TokenKind.CLOSE,          # )
         TokenKind.SEMI            # ;
         ])

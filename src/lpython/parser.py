@@ -15,7 +15,17 @@ HANDLERS = {}
 
 
 class Parser:
-    def __init__(self, lexer):
+    def __init__(self, lexer, debug_messages=False):
+        if debug_messages:
+            def __debug(*args, **kwargs):
+                kwargs['file'] = sys.stderr
+                print(*args, **kwargs)
+            self.__debug = __debug
+        else:
+            def __none(*args, **kwargs):
+                pass
+            self.__debug = __none
+
         self._l = lexer
         self._o = io.StringIO()
         self._eof = False
@@ -37,11 +47,16 @@ class Parser:
             read_length = token.position
             start_position = 0
 
+        self.__debug("Reading", read_length, "at", start_position, "for "
+                     "precontext of", token)
         return self._l.seek_and_peek(start_position, read_length)
 
     def _succeeding_context_for_token(self, token, length=16):
         """Returns some succeeding context for a token in the input stream."""
-        return self._l.seek_and_peek(token.position + len(token.value), length)
+        start_position = token.position + len(token.value)
+        self.__debug("Reading", length, "at", start_position, "for "
+                     "postcontext of", token)
+        return self._l.seek_and_peek(start_position, length)
 
     def _error(self, msg, token):
         print("\r" + "-" * 60, file=sys.stderr)
@@ -106,11 +121,13 @@ class Parser:
 
         while True:
             tok = self._l.next()
+            self.__debug(">> Handling", tok)
             if tok.kind == TokenKind.NONE:
                 continue
 
             continue_parsing = self.handle(tok)
             if not continue_parsing:
+                self.__debug("<<", self._o.getvalue())
                 return self._o.getvalue()
 
     def _write(self, string):
@@ -142,7 +159,7 @@ class Parser:
                 return False
         return False
 
-    @handler_for(TokenKind.UNINTERESTING)
+    @handler_for(TokenKind.VERBATIM)
     def _verbatim(self, tok):
         self._copy(tok)
         return True
@@ -151,10 +168,12 @@ class Parser:
     def _open_paren(self, tok):
         self._parens.append(tok)
         self._copy(tok)
+        self.__debug("Open paren", tok, "New paren-stack:", self._parens)
         return True
 
     @handler_for(TokenKind.CLOSE)
     def _close_paren(self, tok):
+        self.__debug("Closing paren", tok, "for paren-stack:", self._parens)
         try:
             last_paren = self._parens[-1]
             if last_paren.value != CLOSE_TO_OPEN_PAIR[tok.value.strip()]:
@@ -189,6 +208,9 @@ class Parser:
         self._announced_blocks.append(tok)
         self._copy(tok)
         self._write(" ")
+        self.__debug("Block announced by", tok,
+                     "open-blocks:", self._opened_blocks,
+                     "announced-blocks:", self._announced_blocks)
         return True
 
     @handler_for(TokenKind.COLON)
@@ -203,6 +225,9 @@ class Parser:
             self._opened_blocks.append(self._announced_blocks[-1])
             self._write(tok.value.rstrip() + "\n")
             self._indent()
+            self.__debug("Block opening", tok,
+                         "open-blocks:", self._opened_blocks,
+                         "announced-blocks:", self._announced_blocks)
             return False
         else:
             self._error("unskipped : encountered, but no block is opened", tok)
@@ -216,6 +241,9 @@ class Parser:
             self._note("last unclosed paren opened", self._parens[-1])
             return
 
+        self.__debug("Block closing", tok,
+                     "open-blocks:", self._opened_blocks,
+                     "announced-blocks:", self._announced_blocks)
         try:
             if self._opened_blocks[-1].value != tok.value.replace("end", ""):
                 self._error("last opened block '%s' closed by %s"

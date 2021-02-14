@@ -31,6 +31,12 @@ args.add_argument("-b",
                        "the full execution context, and emit the result to "
                        "the standard output.")
 
+args.add_argument("-v",
+                  dest="verbose",
+                  action="store_true",
+                  help="Enable verbose debugging messages of the compiler's "
+                       "internal workings. Implies disabling execution.")
+
 args.add_argument("-t",
                   dest="mode",
                   choices=list(map(lambda c: c.name, load_all())),

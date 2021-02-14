@@ -1,9 +1,10 @@
 from enum import Enum
+import sys
 
 
 class TokenKind(Enum):
     NONE = -1
-    UNINTERESTING = 0
+    VERBATIM = 0
     EOF = 1
     SEMI = 2
     COLON = 3
@@ -50,7 +51,17 @@ TOKEN_BREAKERS = ['(', '[', '{', '}', ']', ')', ':', ';', '/', '\\', '+', '-',
 
 
 class Lex:
-    def __init__(self, stream):
+    def __init__(self, stream, debug_messages=False):
+        if debug_messages:
+            def __debug(*args, **kwargs):
+                kwargs['file'] = sys.stderr
+                print(*args, **kwargs)
+            self.__debug = __debug
+        else:
+            def __none(*args, **kwargs):
+                pass
+            self.__debug = __none
+
         self._s = stream
         self._last = None
         self._m = []
@@ -131,6 +142,7 @@ class Lex:
         tok = NONE
 
         pos = self.mark()
+        self.__debug(">> Reading @", self.tell())
 
         symbol_kind = TokenKind.NONE
         if self.peek_and_consume(";"):
@@ -153,12 +165,15 @@ class Lex:
         if symbol_kind != TokenKind.NONE:
             # Consume consecutive whitespace after the symbols.
             token_text = self._last
+            self.__debug("Symbol: %s '%s'" % (symbol_kind, token_text))
             while self.peek_and_consume(" "):
                 self.remark()
                 token_text += self._last
 
             self.unmark()
-            return Token(symbol_kind, pos, token_text)
+            tok = Token(symbol_kind, pos, token_text)
+            self.__debug("<<", tok)
+            return tok
 
         # Try handling some keywords...
         kw_kind = TokenKind.NONE
@@ -189,31 +204,39 @@ class Lex:
 
         if kw_kind != TokenKind.NONE:
             tok = Token(kw_kind, pos, self._last)
+            self.__debug("Keyword ", tok)
 
         # Now that keywords have been consumed if any found, see if the next
         # char is a whitespace separator.
         ch = self.peek(1)
         if (not ch or ch in WHITESPACE or ch in TOKEN_BREAKERS) \
-                and tok != NONE:
+                and tok.kind != TokenKind.NONE:
             # Yay, the token is separated and not continued with a letter or
             # number.
             self.unmark()
+            self.__debug("<<", tok)
             return tok
-        else:
+        elif tok.kind != TokenKind.NONE:
             # Nay, the token continues with a different letter, so it's not a
             # keyword by itself.
             self.jump()  # Jump back to beginning of token.
             self.mark()  # And reinstate the marker.
+            self.__debug("Keyword", tok, "continues with other letters")
 
         chars = []
         consume_whitespace_only = False
+        self.__debug("Sequencing... \"", end='')
         while True:
             try:
                 ch = self.read(1)
+                self.__debug(ch, end='')
                 if ch in TOKEN_BREAKERS:
                     # Token breaker encountered.
+                    self.__debug("\"")
+                    self.__debug("\tToken breaker", end='')
                     if not chars:
                         # The token breaker was the only input so far consumed.
+                        self.__debug(", but only char.", end='')
                         chars.append(ch)
                         consume_whitespace_only = True
                         continue
@@ -221,6 +244,7 @@ class Lex:
                         # Break the current token by jumping to just before the
                         # last successful read and prepare the current
                         # character to be part of the next token.
+                        self.__debug(", breaking...", end='')
                         consume_whitespace_only = False
                         self.jump()
                         break
@@ -240,17 +264,27 @@ class Lex:
                 chars.append(ch)
                 self.remark()  # Set last read char position.
             except StopIteration:
+                self.__debug("\"")
+                self.__debug("\tEOF!", end='')
                 consume_whitespace_only = False
                 if not chars:
                     # If nothing is read and we are at the end, produce EOF.
                     self.unmark()
                     self._s.write(EOF_MAGIC)
-                    return Token(TokenKind.EOF, pos, EOF_MAGIC)
+                    tok = Token(TokenKind.EOF, pos, EOF_MAGIC)
+                    self.__debug("")
+                    self.__debug("<<", tok)
+                    return tok
                 # Otherwise, go and return what was collected.
+                self.__debug("... but we have a token.", end='')
                 break
 
+        self.__debug()
         self.unmark()  # Drop the seekback marker of this call.
         string = "".join(chars)
         if string.strip() == "":
+            self.__debug("\tRead empty sequence.")
             return NONE
-        return Token(TokenKind.UNINTERESTING, pos, string)
+        tok = Token(TokenKind.VERBATIM, pos, string)
+        self.__debug("<<", tok)
+        return tok
