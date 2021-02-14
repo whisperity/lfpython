@@ -89,3 +89,7 @@ def test_eof():
     eof = Lex(empty).next()
     assert(empty.getvalue() == EOF_MAGIC)
     assert(eof.kind == TokenKind.EOF and eof.position == 0)
+
+
+def test_special_in_string():
+    assert(toks("sp = xxx.split(\"/\")"))

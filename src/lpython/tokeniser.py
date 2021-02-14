@@ -244,6 +244,7 @@ class Lex:
                         # The token breaker was the only input so far consumed.
                         self.__debug(", but only char.", end='')
                         chars.append(ch)
+                        self.remark()  # Save this char as last read.
                         consume_whitespace_only = True
                         continue
                     else:

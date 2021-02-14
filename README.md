@@ -104,6 +104,45 @@ Fizzbuzz
 The bare mode does not perform any pre-parsing or business logic.
 The variables `STDIN`, `STDOUT`, and `STDERR` alias `sys.stdin`, `sys.stdout`, and `sys.stderr`, respectively.
 
+### `json` mode
+
+The input stream is loaded and parsed as a [JSON](http://json.org), and made available as `DATA`.
+This mode is aimed at implementing JSON filters and transformers.
+After the user's code executed, the JSON is formatted and printed to the standard output.
+
+#### JSON filter
+
+~~~~
+$ echo '[{"Timezone": "Europe/London"}, {"Timezone": "America/New York"}]' | \
+    lpython -t json 'for rec in DATA: for k, v in dict(rec).items(): ' \
+        'if k == "Timezone": split = v.split("/"); ' \
+        'rec["Country"] = split[0]; rec["City"] = split[1]; del rec["Timezone"]; ' \
+        'endif; endfor; endfor;'
+[{"Country": "Europe", "City": "London"}, {"Country": "America", "City": "New York"}]
+~~~~
+
+The JSON mode also offers the `PRETTY()` function, which turns out formatted JSON output:
+
+~~~~
+$ echo '[{"Timezone": "Europe/London"}, {"Timezone": "America/New York"}]' | \
+    lpython -t json 'for rec in DATA: for k, v in dict(rec).items(): ' \
+        'if k == "Timezone": split = v.split("/"); ' \
+        'rec["Country"] = split[0]; rec["City"] = split[1]; del rec["Timezone"]; ' \
+        'endif; endfor; endfor; ' \
+        'PRETTY();'
+[
+    {
+        "City": "London",
+        "Country": "Europe"
+    },
+    {
+        "City": "New York",
+        "Country": "America"
+    }
+]
+~~~~
+
+
 Syntax
 ------
 
