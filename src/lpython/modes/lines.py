@@ -13,16 +13,22 @@
 # ---  END  METADATA ---
 #
 # --- BEGIN TEMPLATE ---
+import fileinput
+import sys
 
-print("Template code BEFORE")
 
-if False:
+def OUT(*args):
+    print(*args, end='')
+
+
+def ERR(*args):
+    print(*args, end='', file=sys.stderr)
+
+
+print("RUNNING", __file__)
+
+for LINE in fileinput.input("-"):
     # --- USER CODE GOES HERE ---
     pass
-
-print("Template code AFTER")
-
-if True:
-    print("End.")
 
 # ---  END  TEMPLATE ---

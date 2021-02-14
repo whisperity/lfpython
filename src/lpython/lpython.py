@@ -5,33 +5,34 @@ import sys
 from .args import args
 from .builder import load
 from .parser import Parser
+from .spawn import temporary, spawn
 from .tokeniser import Lex
 
 
-def transpile(codeStream, outputStream):
+def transpile(code_stream, output_stream):
     """Rewrites the input stream of program code according to LPython rules."""
-    lexer = Lex(codeStream)
+    lexer = Lex(code_stream)
     parser = Parser(lexer)
 
     while not parser.eof:
         stmt = parser.parse()
-        outputStream.write(stmt)
+        output_stream.write(stmt)
 
-    return outputStream
+    return output_stream
 
 
-def build(mode, codeStream, outputStream):
+def build(mode, code_stream, output_stream):
     """Inject the given program code into the template specified by 'mode'
     into the outputStream."""
-    codeStream.seek(0)
+    code_stream.seek(0)
 
     context = load(mode)
-    result = context(codeStream)
+    result = context(code_stream)
 
     result.seek(0)
-    outputStream.seek(0)
-    shutil.copyfileobj(result, outputStream)
-    return outputStream
+    output_stream.seek(0)
+    shutil.copyfileobj(result, output_stream)
+    return output_stream
 
 
 def main(argv):
@@ -73,3 +74,7 @@ def main(argv):
         return 0
 
     print("TODO: Execution...")
+    with temporary(result) as script:
+        return_code = spawn(script, argd.argfwd)
+
+    return return_code
