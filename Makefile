@@ -8,4 +8,5 @@ style:
 
 test:
 	python3 -m pytest -vv src test/
+	cd test; PYTHONPATH="../src" bash ./test_shell.sh; cd ..
 .PHONY: test

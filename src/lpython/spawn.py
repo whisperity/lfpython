@@ -20,5 +20,6 @@ def temporary(code_buffer):
 def spawn(pyscript, argv):
     """Spawns a process and gives it our stdin and stdout."""
     interp = sys.executable if sys.executable else "python3"
-    result = run([interp, pyscript], text=True)
+    argv = argv if argv else []
+    result = run([interp, pyscript] + argv, text=True)
     return result.returncode

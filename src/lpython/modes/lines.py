@@ -8,13 +8,17 @@
 # Description: inside an appropriate loop.
 #
 # Var: LINE - one line from the input as handled in the loop.
-# Fun: OUT(...) - write to the standard output
-# Fun: ERR(...) - write to the standard error
+#
+# Fun: OUT(...) - write to the standard output, explicitly (no newline)
+# Fun: ERR(...) - write to the standard error, explicitly (no newline)
 # ---  END  METADATA ---
 #
 # --- BEGIN TEMPLATE ---
 import fileinput
 import sys
+
+
+ARGS = sys.argv
 
 
 def OUT(*args):
@@ -24,8 +28,6 @@ def OUT(*args):
 def ERR(*args):
     print(*args, end='', file=sys.stderr)
 
-
-print("RUNNING", __file__)
 
 for LINE in fileinput.input("-"):
     # --- USER CODE GOES HERE ---

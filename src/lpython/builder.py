@@ -38,6 +38,8 @@ class ExecutionContext:
             elif k == "Title":
                 self.title = v
             elif k == "Description":
+                if self.description:
+                    self.description += " "
                 self.description += v
             elif k == "Var":
                 self.vars.append(v)
@@ -59,6 +61,10 @@ class ExecutionContext:
                 insertion_found = idx
                 self.leading_spaces = len(line) - len(line.lstrip())
             else:
+                if line.lstrip().startswith("# "):
+                    # Ignore comments.
+                    continue
+
                 if line.rstrip().endswith("pass") and \
                         idx == insertion_found + 1:
                     # Ignore a null statement ("pass") right after the
