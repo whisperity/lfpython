@@ -71,16 +71,14 @@ def test_parens():
 def test_string_concat():
     assert(toks("input(\"Foo\" + x + \":\");") == [
         TokenKind.VERBATIM,  # input
-        TokenKind.OPEN,           # (
+        TokenKind.OPEN,      # (
         TokenKind.VERBATIM,  # "Foo" (+ ws)
         TokenKind.VERBATIM,  # +     (+ ws)
         TokenKind.VERBATIM,  # x     (+ ws)
         TokenKind.VERBATIM,  # +     (+ ws)
-        TokenKind.VERBATIM,  # "
-        TokenKind.COLON,          # :
-        TokenKind.VERBATIM,  # "
-        TokenKind.CLOSE,          # )
-        TokenKind.SEMI            # ;
+        TokenKind.VERBATIM,  # ":"
+        TokenKind.CLOSE,     # )
+        TokenKind.SEMI       # ;
         ])
 
 
@@ -92,4 +90,55 @@ def test_eof():
 
 
 def test_special_in_string():
-    assert(toks("sp = xxx.split(\"/\")"))
+    assert(toks("sp = xxx.split(\"/\")") == [TokenKind.VERBATIM,  # sp
+                                             TokenKind.VERBATIM,  # =
+                                             TokenKind.VERBATIM,  # xxx.split
+                                             TokenKind.OPEN,      # (
+                                             TokenKind.VERBATIM,  # "/"
+                                             TokenKind.CLOSE      # )
+                                             ])
+
+
+def test_colon_in_string():
+    assert(toks("X = \"if Y: z()\"") == [TokenKind.VERBATIM,  # X
+                                         TokenKind.VERBATIM,  # =
+                                         TokenKind.VERBATIM,  # "if Y: z()"
+                                         ])
+
+
+def test_nested_strings():
+    input_text = """
+X = foo();
+Y = "bar";
+Z = 'baz';
+A = "if 'foo' is not None: qux()";
+"""
+    assert(toks(input_text) == [TokenKind.VERBATIM,  # X
+                                TokenKind.VERBATIM,  # =
+                                TokenKind.VERBATIM,  # foo
+                                TokenKind.OPEN,      # (
+                                TokenKind.CLOSE,     # )
+                                TokenKind.SEMI,      # ;
+
+                                TokenKind.VERBATIM,  # Y
+                                TokenKind.VERBATIM,  # =
+                                TokenKind.VERBATIM,  # "bar"
+                                TokenKind.SEMI,      # ;
+
+                                TokenKind.VERBATIM,  # Z
+                                TokenKind.VERBATIM,  # =
+                                TokenKind.VERBATIM,  # 'baz'
+                                TokenKind.SEMI,      # ;
+
+                                TokenKind.VERBATIM,  # A
+                                TokenKind.VERBATIM,  # =
+                                # "if 'foo' is not None: qux()"
+                                TokenKind.VERBATIM,
+                                TokenKind.SEMI       # ;
+                                ])
+
+    tokv = lex(input_text)
+    assert(len(tokv) == 18)
+    assert(tokv[8].value == "\"bar\"")
+    assert(tokv[12].value == "\'baz\'")
+    assert(tokv[16].value == "\"if 'foo' is not None: qux()\"")

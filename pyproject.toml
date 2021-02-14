@@ -6,6 +6,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
+addopts = "-vv"
 console_output_style = "count"
 testpaths = ["src",
              "test/",

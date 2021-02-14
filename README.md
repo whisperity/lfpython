@@ -51,7 +51,7 @@ Help for the 'lines' mode ...
 
  * **`-n`**: Show the result of the transformed code, but do not execute.
  * **`-b`**: Show the result of the transformed and injected code, but do not execute.
- * **`-t`**` `_`XXX`_: use _`XXX`_ mode. Defaults to _`lines`_.
+ * **`-t XXX`**: use _`XXX`_ mode. Defaults to _`lines`_.
 
 ### Passing command-line arguments
 
@@ -81,7 +81,7 @@ error respectively, without a newline.
 $ seq 1 15 | lpython 'if int(LINE) % 15 == 0: print("Fizzbuzz"); ' \
     'elif int(LINE) % 3 == 0: print("Fizz");' \
     'elif int(LINE) % 5 == 0: print("Buzz");' \
-    'else: OUT(LINE); endif')
+    'else: OUT(LINE); endif'
 1
 2
 Fizz
@@ -141,6 +141,10 @@ $ echo '[{"Timezone": "Europe/London"}, {"Timezone": "America/New York"}]' | \
     }
 ]
 ~~~~
+
+### `csv` mode
+
+> **TODO.**
 
 
 Syntax

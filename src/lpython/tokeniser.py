@@ -1,4 +1,5 @@
 from enum import Enum
+import io
 import sys
 
 
@@ -139,12 +140,68 @@ class Lex:
             return True
         return False
 
+    def _consume_quoted(self, start_quote):
+        """Consumes the input starting at the current position and quote
+        until that quote is over.
+        """
+        self.__debug("Encountered quote %c" % start_quote)
+
+        ch = self.read(1)
+        if ch != start_quote:
+            raise ValueError("Expected input to continue with %c but found "
+                             "%c instead." % (start_quote, ch))
+
+        result = io.StringIO()
+        result.write(ch)
+
+        self.__debug("Sequencing quote: %c" % ch, end='')
+        escape = False
+        while True:
+            try:
+                ch = self.read(1)
+                result.write(ch)
+                self.__debug(ch, end='')
+            except StopIteration:
+                self.__debug()
+                self.__debug("End of file while consuming quote.")
+                raise
+
+            if ch == start_quote and not escape:
+                # The quote should be over, otherwise the input is ill-formed.
+                break
+            elif ch == start_quote and escape:
+                # Skip extra logic if the quote symbol is escaped.
+                escape = False
+                continue
+
+            if ch == "\\":  # \ encountered
+                if not escape:
+                    # \ marks the beginning of an escape.
+                    escape = True
+                continue
+
+            if escape:
+                # If the previous mark was escaping, it escaped the current
+                # character.
+                escape = False
+
+        self.__debug()
+        self.__debug("Consumed quote:", result.getvalue())
+        return result.getvalue()
+
     def next(self):
         """Lexes the next token."""
         tok = NONE
 
         pos = self.mark()
         self.__debug(">> Reading @", self.tell())
+
+        if self.peek(1) in ["'", "\""]:
+            quoted = self._consume_quoted(self.peek(1))
+            tok = Token(TokenKind.VERBATIM, pos, quoted)
+            self.__debug("<<", tok)
+            self.unmark()
+            return tok
 
         symbol_kind = TokenKind.NONE
         if self.peek_and_consume(";"):
