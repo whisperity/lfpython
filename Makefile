@@ -7,5 +7,5 @@ style:
 .PHONY: style
 
 test:
-	python3 -m pytest src test/
+	python3 -m pytest -vv src test/
 .PHONY: test

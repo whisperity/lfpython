@@ -68,6 +68,22 @@ def test_parens():
                                     TokenKind.COLON])
 
 
+def test_string_concat():
+    assert(toks("input(\"Foo\" + x + \":\");") == [
+        TokenKind.UNINTERESTING,  # input
+        TokenKind.OPEN,           # (
+        TokenKind.UNINTERESTING,  # "Foo" (+ ws)
+        TokenKind.UNINTERESTING,  # +     (+ ws)
+        TokenKind.UNINTERESTING,  # x     (+ ws)
+        TokenKind.UNINTERESTING,  # +     (+ ws)
+        TokenKind.UNINTERESTING,  # "
+        TokenKind.COLON,          # :
+        TokenKind.UNINTERESTING,  # "
+        TokenKind.CLOSE,          # )
+        TokenKind.SEMI            # ;
+        ])
+
+
 def test_eof():
     empty = io.StringIO("")
     eof = Lex(empty).next()

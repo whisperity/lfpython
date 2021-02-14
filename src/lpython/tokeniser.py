@@ -35,8 +35,8 @@ class Token:
         self.value = value
 
     def __repr__(self):
-        return "T<%d(%s), %d, \"%s\">" % (self.kind.value, self.kind.name,
-                                          self.position, self.value)
+        return "T<%d(%s), %d, %s>" % (self.kind.value, self.kind.name,
+                                      self.position, self.value)
 
 
 NONE = Token(TokenKind.NONE, -1)
@@ -55,17 +55,26 @@ class Lex:
         self._last = None
         self._m = []
 
+    def tell(self):
+        """Tells the current position in the input buffer."""
+        return self._s.tell()
+
     def mark(self):
         """Saves the current position into the jumpback stack."""
-        self._m.append(self._s.tell())
-        return self._s.tell()
+        self._m.append(self.tell())
+        return self.tell()
+
+    def last_mark(self):
+        """Tells the position where the last mark() or remark() put a jumpback.
+        """
+        return self._m[-1]
 
     def remark(self):
         """Changes the last marked jumpback to the current position."""
         if not self._m:
             self.mark()
         else:
-            self._m[-1] = self._s.tell()
+            self._m[-1] = self.tell()
 
     def unmark(self):
         """Removes the last jumpback position."""
@@ -197,22 +206,41 @@ class Lex:
             self.mark()  # And reinstate the marker.
 
         chars = []
+        consume_whitespace_only = False
         while True:
             try:
                 ch = self.read(1)
                 if ch in TOKEN_BREAKERS:
                     # Token breaker encountered.
-                    self.jump()  # ... *before* the token.
-                    break
+                    if not chars:
+                        # The token breaker was the only input so far consumed.
+                        chars.append(ch)
+                        consume_whitespace_only = True
+                        continue
+                    else:
+                        # Break the current token by jumping to just before the
+                        # last successful read and prepare the current
+                        # character to be part of the next token.
+                        consume_whitespace_only = False
+                        self.jump()
+                        break
                 if ch in WHITESPACE:
                     # Whitespace encountered, break off the token, but consume
                     # the whitespace.
                     chars.append(ch)
+                    consume_whitespace_only = False
+                    break
+                if consume_whitespace_only and ch not in WHITESPACE:
+                    # If whitespace reading was enabled and found not a white
+                    # space, the token must end.
+                    self.jump()  # Go back to before the current character.
+                    consume_whitespace_only = False
                     break
 
                 chars.append(ch)
                 self.remark()  # Set last read char position.
             except StopIteration:
+                consume_whitespace_only = False
                 if not chars:
                     # If nothing is read and we are at the end, produce EOF.
                     self.unmark()
