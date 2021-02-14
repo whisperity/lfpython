@@ -30,7 +30,7 @@ The code given to `lpython` is generally the same as normal Python code, except 
 
  * **Lines are terminated by `;` (semicolon)**, instead of a newline. Newlines still work, but the entire idea is to not deal with newlines.
  * Due to not dealing with newlines and whitespace, the indentation-based "scoping" is also side-stepped:
-    * Everything that would begin a scope and require indented code is instead closed with an `endX` keyword.
-    * For example: `if X: print(X); endif;`, `while True: endwhile;`, `def identity(a): return a; enddef`.
+    * Everything that would begin a scope and require indented code is instead closed with an `end___` keyword.
+    * For example: `if X: print(X); endif;`, `while True: pass; endwhile;`, `def identity(a): return a; enddef`.
 
 Everything else in-between is expected to behave as it would in Python.

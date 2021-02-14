@@ -6,9 +6,6 @@ style:
 	flake8 src/ test/
 .PHONY: style
 
-test: unit_test
+test:
+	python3 -m pytest src test/
 .PHONY: test
-
-unit_test:
-	python3 -m pytest src test/unit
-.PHONY: unit_test
