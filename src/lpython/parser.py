@@ -213,6 +213,46 @@ class Parser:
                      "announced-blocks:", self._announced_blocks)
         return True
 
+    @handler_for(TokenKind.ELIF, TokenKind.ELSE)
+    def _if_continuity(self, tok):
+        if self._parens:
+            # If there are some open parens, the : does not herald the begin
+            # of a block.
+            self._copy(tok)
+            self._write(" ")
+            return True
+
+        # An elif or else requires a previously open "if", but needs to close
+        # the if's block, put the elif on the same indent level as the if was,
+        # and open a new block.
+        try:
+            if self._opened_blocks[-1].kind not in [TokenKind.IF,
+                                                    TokenKind.ELIF]:
+                self._error("'%s' encountered but no previous 'if'"
+                            % tok.value,
+                            tok)
+                self._note("previous unclosed block here",
+                           self._opened_blocks[-1])
+                return False
+        except IndexError:
+            self._error("'%s' encountered but no previous 'if'" % tok.value,
+                        tok)
+            return False
+
+        # Close the if.
+        self._opened_blocks.pop()
+        self._announced_blocks.pop()
+
+        self.__debug("Block closed by", tok,
+                     "open-blocks:", self._opened_blocks,
+                     "announced-blocks:", self._announced_blocks)
+
+        # Write the elif/else and start a new block.
+        self._write("\n")
+        self._indent()
+        ret = self._open_kwscope(tok)
+        return ret
+
     @handler_for(TokenKind.COLON)
     def _colon(self, tok):
         if self._parens:
@@ -245,7 +285,12 @@ class Parser:
                      "open-blocks:", self._opened_blocks,
                      "announced-blocks:", self._announced_blocks)
         try:
-            if self._opened_blocks[-1].value != tok.value.replace("end", ""):
+            previous_block = self._opened_blocks[-1].value
+            if previous_block in ["elif", "else"]:
+                # elif/else's block is just like an if block.
+                previous_block = "if"
+
+            if previous_block != tok.value.replace("end", ""):
                 self._error("last opened block '%s' closed by %s"
                             % (self._opened_blocks[-1].value, tok.value), tok)
                 self._note("last block opened here", self._opened_blocks[-1])

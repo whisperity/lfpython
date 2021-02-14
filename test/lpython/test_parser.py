@@ -109,3 +109,96 @@ def test_multi_scope_different_swapclose(capfd):
     out, err = capfd.readouterr()
     assert(out.rstrip() == "if X:\n    print()\n    with Y:\n        print()")
     assert("last opened block 'with' closed by endif" in err)
+
+
+def test_ifelse(capfd):
+    parse("if X: a(); else: b(); endif")
+    out, err = capfd.readouterr()
+    assert(out.rstrip() == "if X:\n    a()\n    \nelse :\n    b()")
+    assert(not err)
+
+
+def test_else(capfd):
+    parse("else: b(); endif")
+    out, err = capfd.readouterr()
+    assert("'else' encountered but no previous 'if'" in err)
+
+
+def test_elif(capfd):
+    parse("elif X: a(); endif")
+    out, err = capfd.readouterr()
+    assert("'elif' encountered but no previous 'if'" in err)
+
+
+def test_whileelse(capfd):
+    parse("while X: a(); else Y: b(); endif; endwhile")
+    out, err = capfd.readouterr()
+    assert("'else' encountered but no previous 'if'" in err)
+
+
+def test_ifelif(capfd):
+    parse("if X: a(); elif Y: b(); endif")
+    out, err = capfd.readouterr()
+    assert(out.rstrip() == "if X:\n    a()\n    \nelif Y:\n    b()")
+    assert(not err)
+
+
+def test_ifelif_multi(capfd):
+    parse("if X: a(); elif Y: b(); elif Z: c(); endif")
+    out, err = capfd.readouterr()
+    assert(out.rstrip() == "if X:\n    a()\n    \n"
+                           "elif Y:\n    b()\n    \n"
+                           "elif Z:\n    c()")
+    assert(not err)
+
+
+def test_ifelifelse(capfd):
+    parse("if X: print(); elif Y: print(); else: print(); endif")
+    out, err = capfd.readouterr()
+    assert(out.rstrip() ==
+           "if X:\n    print()\n    \n"
+           "elif Y:\n    print()\n    \n"
+           "else :\n    print()")
+    assert(not err)
+
+
+def test_ifelifelifelse(capfd):
+    parse("if X: print(); "
+          "elif Y: print(); "
+          "elif Z: print(); "
+          "else: print(); "
+          "endif")
+    out, err = capfd.readouterr()
+    assert(out.rstrip() ==
+           "if X:\n    print()\n    \n"
+           "elif Y:\n    print()\n    \n"
+           "elif Z:\n    print()\n    \n"
+           "else :\n    print()")
+    assert(not err)
+
+
+def test_nested_if(capfd):
+    parse("if X: x(); "
+          "if Y: y(); "
+          "elif Yb: yb(); "
+          "endif; "
+          "elif Xb: xb(); "
+          "else: xe(); "
+          "endif")
+    out, err = capfd.readouterr()
+    assert(out.rstrip() ==
+           "if X:\n"
+           "    x()\n"
+           "    if Y:\n"
+           "        y()\n"
+           "        \n"
+           "    elif Yb:\n"
+           "        yb()\n"
+           "        \n"
+           "    \n"
+           "elif Xb:\n"
+           "    xb()\n"
+           "    \n"
+           "else :\n"
+           "    xe()")
+    assert(not err)

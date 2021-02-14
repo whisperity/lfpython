@@ -9,10 +9,10 @@ from .spawn import temporary, spawn
 from .tokeniser import Lex
 
 
-def transpile(code_stream, output_stream, debug=False):
+def transpile(code_stream, output_stream, debug_lex=False, debug_parse=False):
     """Rewrites the input stream of program code according to LPython rules."""
-    lexer = Lex(code_stream, debug)
-    parser = Parser(lexer, debug)
+    lexer = Lex(code_stream, debug_lex)
+    parser = Parser(lexer, debug_parse)
 
     while not parser.eof:
         stmt = parser.parse()
@@ -59,7 +59,7 @@ def main(argv):
 
     code_in = io.StringIO(" ".join(argd.CODE))
     code_out = io.StringIO()
-    transpile(code_in, code_out, argd.verbose)
+    transpile(code_in, code_out, argd.verbose_lex, argd.verbose_parse)
 
     if argd.dry_run:
         # Dry run - emit only the rewritten code.
@@ -73,7 +73,7 @@ def main(argv):
         print(result.getvalue())
         return 0
 
-    if argd.verbose:
+    if argd.verbose_lex or argd.verbose_parse:
         return 0
 
     with temporary(result) as script:

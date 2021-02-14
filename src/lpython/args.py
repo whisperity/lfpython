@@ -31,10 +31,16 @@ args.add_argument("-b",
                        "the full execution context, and emit the result to "
                        "the standard output.")
 
-args.add_argument("-v",
-                  dest="verbose",
+args.add_argument("-vl",
+                  dest="verbose_lex",
                   action="store_true",
-                  help="Enable verbose debugging messages of the compiler's "
+                  help="Enable verbose debugging messages of the lexer's "
+                       "internal workings. Implies disabling execution.")
+
+args.add_argument("-vp",
+                  dest="verbose_parse",
+                  action="store_true",
+                  help="Enable verbose debugging messages of the parser's "
                        "internal workings. Implies disabling execution.")
 
 args.add_argument("-t",

@@ -12,7 +12,9 @@ class TokenKind(Enum):
     CLOSE = 5
 
     IF = 8
-    ENDIF = 9
+    ELIF = 9
+    ELSE = 10
+    ENDIF = 11
 
     WHILE = 16
     ENDWHILE = 17
@@ -179,6 +181,10 @@ class Lex:
         kw_kind = TokenKind.NONE
         if self.peek_and_consume("if"):
             kw_kind = TokenKind.IF
+        elif self.peek_and_consume("elif"):
+            kw_kind = TokenKind.ELIF
+        elif self.peek_and_consume("else"):
+            kw_kind = TokenKind.ELSE
         elif self.peek_and_consume("endif"):
             kw_kind = TokenKind.ENDIF
         elif self.peek_and_consume("while"):
