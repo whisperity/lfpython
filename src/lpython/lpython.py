@@ -35,7 +35,7 @@ def build(mode, code_stream, output_stream):
     return output_stream
 
 
-def main(argv):
+def main(argv=None):
     """The real entry point handler for the program."""
     argd = args.parse_args(argv)
 
