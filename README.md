@@ -51,7 +51,7 @@ Help for the 'lines' mode ...
 
  * **`-n`**: Show the result of the transformed code, but do not execute.
  * **`-b`**: Show the result of the transformed and injected code, but do not execute.
- * **`-t XXX`**: use _`XXX`_ mode. Defaults to _`lines`_.
+ * **`-t XXX`**: use _`XXX`_ mode.
 
 ### Passing command-line arguments
 
@@ -59,7 +59,7 @@ Command-line arguments to `lpython` can be passed to the running script with the
 The argument vector (list) of the invocation is available inside the script as `ARGS`.
 
 ~~~~
-$ lpython -t bare -X "username" -X "$(date)" 'print(ARGS[1], ARGS[2])'
+$ lpython -X "username" -X "$(date)" 'print(ARGS[1], ARGS[2])'
 username "Sun 14 Feb 2021 14:02:33"
 ~~~~
 
@@ -67,9 +67,16 @@ username "Sun 14 Feb 2021 14:02:33"
 Usage modes
 -----------
 
+### `bare` mode
+
+The bare mode does not perform any pre-parsing or business logic.
+This is the default mode when the standard input is a terminal, and not a pipe.
+The variables `STDIN`, `STDOUT`, and `STDERR` alias `sys.stdin`, `sys.stdout`, and `sys.stderr`, respectively.
+
 ### `lines` mode
 
-The default mode which gives the ability to handle each line of the standard input.
+Lines mode allows handling each line of the standard input.
+This is the default mode if the standard input comes from a pipe.
 The values are available through the `LINE` variable.
 
 The functions `OUT` and `ERR` print the arguments to the standard output and
@@ -98,12 +105,6 @@ Fizz
 14
 Fizzbuzz
 ~~~~
-
-### `bare` mode
-
-The bare mode does not perform any pre-parsing or business logic.
-The variables `STDIN`, `STDOUT`, and `STDERR` alias `sys.stdin`, `sys.stdout`, and `sys.stderr`, respectively.
-
 ### `json` mode
 
 The input stream is loaded and parsed as a [JSON](http://json.org), and made available as `DATA`.

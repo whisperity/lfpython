@@ -9,10 +9,11 @@ from .spawn import temporary, spawn
 from .tokeniser import Lex
 
 
-def transpile(code_stream, output_stream, debug_lex=False, debug_parse=False):
+def transpile(code_stream, debug_lex=False, debug_parse=False):
     """Rewrites the input stream of program code according to LPython rules."""
     lexer = Lex(code_stream, debug_lex)
     parser = Parser(lexer, debug_parse)
+    output_stream = io.StringIO()
 
     while not parser.eof:
         stmt = parser.parse()
@@ -21,18 +22,12 @@ def transpile(code_stream, output_stream, debug_lex=False, debug_parse=False):
     return output_stream
 
 
-def build(mode, code_stream, output_stream):
-    """Inject the given program code into the template specified by 'mode'
-    into the outputStream."""
+def build(mode, code_stream):
+    """Inject the given program code into the template specified by 'mode'."""
     code_stream.seek(0)
 
     context = load(mode)
-    result = context(code_stream)
-
-    result.seek(0)
-    output_stream.seek(0)
-    shutil.copyfileobj(result, output_stream)
-    return output_stream
+    return context(code_stream)
 
 
 def main(argv=None):
@@ -41,8 +36,11 @@ def main(argv=None):
 
     if not argd.CODE and argd.mode:
         # No code specified, but a mode was specified.
-        print("No code specified. Showing help for '%s'..." % argd.mode,
+        print("No code specified. Showing help for mode '%s'..." % argd.mode,
               file=sys.stderr)
+        print("Specify '--help' for help about 'lpython' itself.",
+              file=sys.stderr)
+
         template = load(argd.mode)
         print("Name:", template.name)
         print("Title:", template.title)
@@ -57,26 +55,24 @@ def main(argv=None):
             print("  *", fun)
         return 1
 
-    code_in = io.StringIO(" ".join(argd.CODE))
-    code_out = io.StringIO()
-    transpile(code_in, code_out, argd.verbose_lex, argd.verbose_parse)
+    code = io.StringIO(" ".join(argd.CODE))
+    code = transpile(code, argd.verbose_lex, argd.verbose_parse)
 
     if argd.dry_run:
         # Dry run - emit only the rewritten code.
-        print(code_out.getvalue())
+        print(code.getvalue())
         return 0
 
-    result = io.StringIO()
-    build(argd.mode, code_out, result)
+    code = build(argd.mode, code)
 
     if argd.build_only:
-        print(result.getvalue())
+        print(code.getvalue())
         return 0
 
     if argd.verbose_lex or argd.verbose_parse:
         return 0
 
-    with temporary(result) as script:
+    with temporary(code) as script:
         return_code = spawn(script, argd.argfwd)
 
     return return_code

@@ -1,6 +1,17 @@
 import argparse
+import sys
 
 from .builder import load_all
+
+
+def default_mode():
+    """Sets the default mode to line-by-line execution if the standard input
+    it not a terminal. In most cases, this means it is a pipe, or a file.
+    """
+    if not sys.stdin.isatty():
+        return "lines"
+    return "bare"
+
 
 args = argparse.ArgumentParser(
         prog="lpython",
@@ -46,13 +57,15 @@ args.add_argument("-vp",
 args.add_argument("-t",
                   dest="mode",
                   choices=list(map(lambda c: c.name, load_all())),
-                  default="lines",
+                  default=default_mode(),
                   help="The operational framework to embed the script into "
                        "during execution. Different choices here affect what "
                        "variables are available during execution and how the "
                        "code is structured. When called with a '-t' argument "
                        "but without code to execute, a help text about the "
-                       "specified mode is shown."
+                       "specified mode is shown. Defaults to \"bare\" mode "
+                       "if the standard input is a shell, and \"lines\" mode "
+                       "otherwise, i.e. when it is a pipe or a file."
                   )
 
 args.add_argument("-X",
