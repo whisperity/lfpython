@@ -47,3 +47,23 @@ jobs:
       - name: "Execute tests"
         run: |
           make test
+
+      - name: "Create package"
+        id: package
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        run: |
+          python3 -m pip install --upgrade build setuptools wheel
+          make package
+          WHLFILE="$(find ./dist -name '*.whl' -printf '%f')"
+          RELEASE_NAME="$(echo $WHLFILE | sed 's/\.whl//g')"
+          echo "Package created: dist/${WHLFILE} for release ${RELEASE_NAME}"
+          echo "::set-output name=WHLFILE::${WHLFILE}"
+          echo "::set-output name=RELEASE_NAME::${RELEASE_NAME}"
+
+      - name: "Upload package artefact"
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.package.outputs.RELEASE_NAME }}
+          path: "dist/${{ steps.package.outputs.WHLFILE }}"
