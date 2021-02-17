@@ -62,13 +62,15 @@ def main(argv=None):
         print("Title:", template.title)
         print("Description:", template.description)
         print()
-        print("Available variables:")
-        for var in template.vars:
-            print("  *", var)
-        print()
-        print("Available functions:")
-        for fun in template.funs:
-            print("  *", fun)
+        if template.vars:
+            print("Available variables:")
+            for var in template.vars:
+                print("  *", var)
+            print()
+        if template.funs:
+            print("Available functions:")
+            for fun in template.funs:
+                print("  *", fun)
         return 1
 
     code = io.StringIO(" ".join(argd.CODE))
