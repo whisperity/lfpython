@@ -56,16 +56,34 @@ jobs:
         run: |
           python3 -m pip install --upgrade build setuptools wheel
           make package
+
           WHLFILE="$(find ./dist -name '*.whl' -printf '%f')"
           RELEASE_NAME="$(echo $WHLFILE | sed 's/\.whl//g')"
           echo "Package created: dist/${WHLFILE} for release ${RELEASE_NAME}"
           echo "::set-output name=WHLFILE::${WHLFILE}"
           echo "::set-output name=RELEASE_NAME::${RELEASE_NAME}"
 
-      - name: "Upload package artefact"
+          TARGZFILE="$(find ./dist -name '*.tar.gz' -printf '%f')"
+          SHORT_TAG="$(echo $TARGZFILE | sed 's/\.tar.gz//g')"
+          echo "Package sources built: dist/${TARGZFILE}"
+          echo "Package short-tag: ${SHORT_TAG}"
+          echo "::set-output name=TARGZFILE::${TARGZFILE}"
+          echo "::set-output name=SHORT_TAG::${SHORT_TAG}"
+
+      - name: "Upload package source"
         if: ${{ matrix.os == 'ubuntu-20.04' }}
         continue-on-error: true
         uses: actions/upload-artifact@v2
         with:
+          if-no-files-found: error
           name: ${{ steps.package.outputs.RELEASE_NAME }}
           path: "dist/${{ steps.package.outputs.WHLFILE }}"
+
+      - name: "Upload package Wheel distribution"
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          name: ${{ steps.package.outputs.SHORT_TAG }}
+          path: "dist/${{ steps.package.outputs.TARGZFILE }}"
