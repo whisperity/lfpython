@@ -79,8 +79,7 @@ Lines mode allows handling each line of the standard input.
 This is the default mode if the standard input comes from a pipe.
 The values are available through the `LINE` variable.
 
-The functions `OUT` and `ERR` print the arguments to the standard output and
-error respectively, without a newline.
+The functions `OUT` and `ERR` print the arguments verbatim to the standard output and error respectively, without adding an additional trailing newline.
 
 #### FizzBuzz
 
@@ -88,7 +87,7 @@ error respectively, without a newline.
 $ seq 1 15 | lpython 'if int(LINE) % 15 == 0: print("Fizzbuzz"); ' \
     'elif int(LINE) % 3 == 0: print("Fizz");' \
     'elif int(LINE) % 5 == 0: print("Buzz");' \
-    'else: OUT(LINE); endif'
+    'else: print(LINE); endif'
 1
 2
 Fizz
@@ -105,6 +104,22 @@ Fizz
 14
 Fizzbuzz
 ~~~~
+
+### `csv` mode
+
+The input stream is loaded and parsed as a [CSV](http://docs.python.org/3.6/library/csv.html) file, with each row made available as `ROW`.
+The `HEADER()` function returns `True` if the first row is in `ROW`.
+After the user's code is executed and the rows are transformed one by one, the resulting CSV is printed to the standard output.
+
+~~~~
+$ echo -e "Foo,Bar,Baz\n1,2,3\n4,5,6" | \
+    lpython -t csv 'for idx, elem in enumerate(ROW): ' \
+        'if not HEADER(): ROW[idx] = int(elem) * 10; endif; endfor;'
+Foo,Bar,Baz
+10,20,30
+40,50,60
+~~~~
+
 ### `json` mode
 
 The input stream is loaded and parsed as a [JSON](http://json.org), and made available as `DATA`.
@@ -142,10 +157,6 @@ $ echo '[{"Timezone": "Europe/London"}, {"Timezone": "America/New York"}]' | \
     }
 ]
 ~~~~
-
-### `csv` mode
-
-> **TODO.**
 
 
 Syntax

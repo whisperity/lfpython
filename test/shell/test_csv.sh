@@ -1,30 +1,23 @@
 #!/bin/bash
 SOCKET="$1"
 
-EXPECTED=$(cat <<-EOM
-1
-2
-Fizz
-4
-Buzz
-Fizz
-7
-8
-Fizz
-Buzz
-11
-Fizz
-13
-14
-Fizzbuzz
+INPUT=$(cat <<-EOM
+Foo,Bar,Baz
+1,2,3
+4,5,6
 EOM
 )
 
-# Note that the command-line for the Python script is only broken so *this*
-# script is more easily readable.
-RESULT=$(seq 1 15 | python3 -m lpython -t lines \
-    'if int(LINE) % 15 == 0: print("Fizzbuzz"); elif int(LINE) % 3 == 0: print("Fizz");' \
-    'elif int(LINE) % 5 == 0: print("Buzz"); else: print(LINE); endif')
+EXPECTED=$(cat <<-EOM
+Foo,Bar,Baz
+10,20,30
+40,50,60
+EOM
+)
+
+SCRIPT='for idx, elem in enumerate(ROW): if not HEADER(): ROW[idx] = int(elem) * 10; endif; endfor'
+
+RESULT=$(echo "$INPUT" | python3 -m lpython -t csv "${SCRIPT}" | tr -d '\r')
 
 if [[ "$EXPECTED" != "$RESULT" ]]
 then

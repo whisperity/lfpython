@@ -9,8 +9,8 @@
 #
 # Var: LINE - one line from the input as handled in the loop.
 #
-# Fun: OUT(...) - write to the standard output, explicitly (no newline)
-# Fun: ERR(...) - write to the standard error, explicitly (no newline)
+# Fun: OUT(...) - write to the standard output, explicitly (no newline at end)
+# Fun: ERR(...) - write to the standard error, explicitly (no newline at end)
 # ---  END  METADATA ---
 #
 # --- BEGIN TEMPLATE ---
@@ -30,6 +30,8 @@ def ERR(*args):
 
 
 for LINE in fileinput.input("-"):
+    if LINE[-1] == "\n":
+        LINE = LINE[:-1]
     # --- USER CODE GOES HERE ---
     pass
 

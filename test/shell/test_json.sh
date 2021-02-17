@@ -27,7 +27,7 @@ EOM
 
 SCRIPT='for rec in DATA: for k, v in dict(rec).items(): if k == "Timezone": split = v.split("/"); rec["Country"] = split[0]; rec["City"] = split[1]; del rec["Timezone"]; endif; endfor; endfor;'
 
-RESULT=$(echo $INPUT | python3 -m lpython -t json "${SCRIPT}")
+RESULT=$(echo "$INPUT" | python3 -m lpython -t json "${SCRIPT}")
 
 if [[ "$EXPECTED" != "$RESULT" ]]
 then

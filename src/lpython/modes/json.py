@@ -6,9 +6,9 @@
 # Description: Loads a JSON from the standard input, offers it for
 # Description: transformation, and after, writes it to the standard output.
 #
-# Var: DATA - the input parsed to JSON, in whatever format the input represents
+# Var: DATA - the parsed JSON input, in whatever format the input represents.
 #
-# Fun: PRETTY - Enable prettified JSON output.
+# Fun: PRETTY - Sets the JSON output to be prettified.
 # ---  END  METADATA ---
 #
 # --- BEGIN TEMPLATE ---
@@ -30,10 +30,10 @@ DATA = json.load(sys.stdin)
 
 # --- USER CODE GOES HERE ---
 
-
-if not __PRETTY_JSON__:
-    print(json.dumps(DATA))
-else:
-    print(json.dumps(DATA, sort_keys=True, indent=4))
+if DATA:
+    if not __PRETTY_JSON__:
+        print(json.dumps(DATA))
+    else:
+        print(json.dumps(DATA, sort_keys=True, indent=4))
 
 # ---  END  TEMPLATE ---
