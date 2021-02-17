@@ -1,3 +1,20 @@
+# Copyright (C) 2020 Whisperity
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import argparse
 import sys
 
@@ -28,19 +45,21 @@ args = argparse.ArgumentParser(
                "used: \"with X: print(); endwith;\"."
         )
 
-args.add_argument("-n",
-                  dest="dry_run",
-                  action="store_true",
-                  help="Do not execute, just rewrite the input code, without "
-                       "the execution context, as Python script and emit the "
-                       "result to the standard output.")
+stage_stop = args.add_mutually_exclusive_group()
 
-args.add_argument("-b",
-                  dest="build_only",
-                  action="store_true",
-                  help="Do not execute, but rewrite the input code and build "
-                       "the full execution context, and emit the result to "
-                       "the standard output.")
+stage_stop.add_argument("-n",
+                        dest="dry_run",
+                        action="store_true",
+                        help="Do not execute, just rewrite the input code, "
+                             "without the execution context, as Python script "
+                             "and emit the result to the standard output.")
+
+stage_stop.add_argument("-b",
+                        dest="build_only",
+                        action="store_true",
+                        help="Do not execute, but rewrite the input code and "
+                             "build the full execution context, and emit the "
+                             "result to the standard output.")
 
 args.add_argument("-vl",
                   dest="verbose_lex",
