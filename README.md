@@ -21,7 +21,14 @@ While you can easily say `some-command-generating-data | grep Foo | awk '{ print
 Installation
 ------------
 
-> **TODO.**
+Install from [PyPI](http://pypi.org/project/lpython/).
+The `lpython` entry point will be made available.
+
+~~~
+$ pip3 install lpython
+$ lpython -h
+usage: lpython [-h] [...]
+~~~
 
 Overview
 --------

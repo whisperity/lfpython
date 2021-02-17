@@ -22,6 +22,7 @@ __READER__ = csv.reader(sys.stdin)
 __OUTPUT__ = []
 __HEADER__ = True
 
+
 def HEADER():
     return __HEADER__
 

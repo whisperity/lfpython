@@ -1,5 +1,4 @@
 import io
-import shutil
 import sys
 
 from .args import args
