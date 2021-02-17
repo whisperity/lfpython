@@ -21,5 +21,5 @@ def spawn(pyscript, argv):
     """Spawns a process and gives it our stdin and stdout."""
     interp = sys.executable if sys.executable else "python3"
     argv = argv if argv else []
-    result = run([interp, pyscript] + argv, text=True)
+    result = run([interp, pyscript] + argv, universal_newlines=True)
     return result.returncode
