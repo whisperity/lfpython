@@ -18,14 +18,14 @@
 import io
 import pytest
 
-from lpython.builder import ExecutionContext as C
+from py_singleline.builder import ExecutionContext as C
 
 user_code = """user1()
 user2()
 if user3():
     print("Y")"""
 
-dummy_header = """# LPython execution context template.
+dummy_header = """# Py-SingleLine execution context template.
 #
 # --- BEGIN METADATA ---
 # File: dummy.py
@@ -58,7 +58,7 @@ print("X")
 
 dummy_multiple = dummy_header + """
 # --- USER CODE GOES HERE ---
-if not lpython:
+if not py_singleline:
     # --- USER CODE GOES HERE ---
 # ---  END  TEMPLATE ---
 """

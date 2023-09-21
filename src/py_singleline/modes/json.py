@@ -1,15 +1,14 @@
-# LPython execution context template.
+# Py-SingleLine execution context template.
 #
 # --- BEGIN METADATA ---
-# File: csv.py
-# Title: CSV filter and transformer
-# Description: Loads a CSV from the standard input, and executes the user code
-# Description: in a loop for each row, allowing transformation. After that,
-# Description: writes the CSV file to the standard output.
+# File: json.py
+# Title: JSON filter and transformer
+# Description: Loads a JSON from the standard input, offers it for
+# Description: transformation, and after, writes it to the standard output.
 #
-# Var: ROW - one row from the input to be handled.
+# Var: DATA - the parsed JSON input, in whatever format the input represents.
 #
-# Fun: HEADER() - True if the first row is in ROW, False otherwise.
+# Fun: PRETTY - Sets the JSON output to be prettified.
 # ---  END  METADATA ---
 #
 # Copyright (C) 2020 Whisperity
@@ -30,29 +29,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # --- BEGIN TEMPLATE ---
-import csv
+import json
 import sys
 
 
 ARGS = sys.argv
-__READER__ = csv.reader(sys.stdin)
-__OUTPUT__ = []
-__HEADER__ = True
+__PRETTY_JSON__ = False
 
 
-def HEADER():
-    return __HEADER__
+def PRETTY():
+    global __PRETTY_JSON__
+    __PRETTY_JSON__ = True
 
 
-for ROW in __READER__:
-    # --- USER CODE GOES HERE ---
-
-    __OUTPUT__.append(ROW)
-    if __HEADER__:
-        __HEADER__ = False
+DATA = json.load(sys.stdin)
 
 
-__WRITER__ = csv.writer(sys.stdout)
-__WRITER__.writerows(__OUTPUT__)
+# --- USER CODE GOES HERE ---
+
+if DATA:
+    if not __PRETTY_JSON__:
+        print(json.dumps(DATA))
+    else:
+        print(json.dumps(DATA, sort_keys=True, indent=4))
 
 # ---  END  TEMPLATE ---

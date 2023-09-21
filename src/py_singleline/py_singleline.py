@@ -26,7 +26,10 @@ from .tokeniser import Lex
 
 
 def transpile(code_stream, debug_lex=False, debug_parse=False):
-    """Rewrites the input stream of program code according to LPython rules."""
+    """
+    Rewrites the input stream of program code according to Py-SingleLine
+    rules.
+    """
     lexer = Lex(code_stream, debug_lex)
     parser = Parser(lexer, debug_parse)
     output_stream = io.StringIO()
@@ -54,7 +57,7 @@ def main(argv=None):
         # No code specified, but a mode was specified.
         print("No code specified. Showing help for mode '%s'..." % argd.mode,
               file=sys.stderr)
-        print("Specify '--help' for help about 'lpython' itself.",
+        print("Specify '--help' for help about 'pysln' itself.",
               file=sys.stderr)
 
         template = load(argd.mode)

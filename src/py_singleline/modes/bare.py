@@ -1,4 +1,4 @@
-# LPython execution context template.
+# Py-SingleLine execution context template.
 #
 # --- BEGIN METADATA ---
 # File: bare.py

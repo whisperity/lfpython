@@ -1,14 +1,16 @@
-# LPython execution context template.
+# Py-SingleLine execution context template.
 #
 # --- BEGIN METADATA ---
-# File: json.py
-# Title: JSON filter and transformer
-# Description: Loads a JSON from the standard input, offers it for
-# Description: transformation, and after, writes it to the standard output.
+# File: lines.py
+# Title: line-by-line text operation
+# Description: Executes the script in a loop that iterates over every line in
+# Description: the standard input. The user's code is automatically placed
+# Description: inside an appropriate loop.
 #
-# Var: DATA - the parsed JSON input, in whatever format the input represents.
+# Var: LINE - one line from the input as handled in the loop.
 #
-# Fun: PRETTY - Sets the JSON output to be prettified.
+# Fun: OUT(...) - write to the standard output, explicitly (no newline at end)
+# Fun: ERR(...) - write to the standard error, explicitly (no newline at end)
 # ---  END  METADATA ---
 #
 # Copyright (C) 2020 Whisperity
@@ -29,28 +31,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # --- BEGIN TEMPLATE ---
-import json
+import fileinput
 import sys
 
 
 ARGS = sys.argv
-__PRETTY_JSON__ = False
 
 
-def PRETTY():
-    global __PRETTY_JSON__
-    __PRETTY_JSON__ = True
+def OUT(*args):
+    print(*args, end='')
 
 
-DATA = json.load(sys.stdin)
+def ERR(*args):
+    print(*args, end='', file=sys.stderr)
 
 
-# --- USER CODE GOES HERE ---
-
-if DATA:
-    if not __PRETTY_JSON__:
-        print(json.dumps(DATA))
-    else:
-        print(json.dumps(DATA, sort_keys=True, indent=4))
+for LINE in fileinput.input("-"):
+    if LINE[-1] == "\n":
+        LINE = LINE[:-1]
+    # --- USER CODE GOES HERE ---
+    pass
 
 # ---  END  TEMPLATE ---

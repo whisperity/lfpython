@@ -16,5 +16,5 @@ dist: setup.py
 	python3 -m build
 
 distclean:
-	rm -rf ./build ./dist ./lpython*.egg-info
+	rm -rf ./build ./dist ./py_singleline*.egg-info
 .PHONY: clean

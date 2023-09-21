@@ -18,8 +18,8 @@
 import io
 import pytest  # noqa
 
-from lpython.tokeniser import Lex
-from lpython.parser import Parser
+from py_singleline.tokeniser import Lex
+from py_singleline.parser import Parser
 
 
 def parse(code):

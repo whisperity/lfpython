@@ -26,9 +26,9 @@ basedir = os.path.join(os.path.dirname(__file__), "modes")
 
 class ExecutionContext:
     def __init__(self, text):
-        """Load an LPython execution template from the given text."""
+        """Load an Py-SingleLine execution template from the given text."""
         lines = text.splitlines(False)
-        if lines[0] != "# LPython execution context template.":
+        if lines[0] != "# Py-SingleLine execution context template.":
             raise ValueError("Invalid headerline")
 
         metadata_start = lines.index("# --- BEGIN METADATA ---") + 1

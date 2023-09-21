@@ -39,7 +39,7 @@ EOM
 
 # Note that the command-line for the Python script is only broken so *this*
 # script is more easily readable.
-RESULT=$(seq 1 15 | python3 -m lpython -t lines \
+RESULT=$(seq 1 15 | python3 -m pysln -t lines \
     'if int(LINE) % 15 == 0: print("Fizzbuzz"); elif int(LINE) % 3 == 0: print("Fizz");' \
     'elif int(LINE) % 5 == 0: print("Buzz"); else: print(LINE); endif')
 

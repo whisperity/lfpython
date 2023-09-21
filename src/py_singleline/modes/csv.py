@@ -1,16 +1,15 @@
-# LPython execution context template.
+# Py-SingleLine execution context template.
 #
 # --- BEGIN METADATA ---
-# File: lines.py
-# Title: line-by-line text operation
-# Description: Executes the script in a loop that iterates over every line in
-# Description: the standard input. The user's code is automatically placed
-# Description: inside an appropriate loop.
+# File: csv.py
+# Title: CSV filter and transformer
+# Description: Loads a CSV from the standard input, and executes the user code
+# Description: in a loop for each row, allowing transformation. After that,
+# Description: writes the CSV file to the standard output.
 #
-# Var: LINE - one line from the input as handled in the loop.
+# Var: ROW - one row from the input to be handled.
 #
-# Fun: OUT(...) - write to the standard output, explicitly (no newline at end)
-# Fun: ERR(...) - write to the standard error, explicitly (no newline at end)
+# Fun: HEADER() - True if the first row is in ROW, False otherwise.
 # ---  END  METADATA ---
 #
 # Copyright (C) 2020 Whisperity
@@ -31,25 +30,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # --- BEGIN TEMPLATE ---
-import fileinput
+import csv
 import sys
 
 
 ARGS = sys.argv
+__READER__ = csv.reader(sys.stdin)
+__OUTPUT__ = []
+__HEADER__ = True
 
 
-def OUT(*args):
-    print(*args, end='')
+def HEADER():
+    return __HEADER__
 
 
-def ERR(*args):
-    print(*args, end='', file=sys.stderr)
-
-
-for LINE in fileinput.input("-"):
-    if LINE[-1] == "\n":
-        LINE = LINE[:-1]
+for ROW in __READER__:
     # --- USER CODE GOES HERE ---
-    pass
+
+    __OUTPUT__.append(ROW)
+    if __HEADER__:
+        __HEADER__ = False
+
+
+__WRITER__ = csv.writer(sys.stdout)
+__WRITER__.writerows(__OUTPUT__)
 
 # ---  END  TEMPLATE ---

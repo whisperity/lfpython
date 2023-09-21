@@ -17,7 +17,7 @@
 
 import io
 
-from lpython.tokeniser import Lex, TokenKind, EOF_MAGIC, NONE
+from py_singleline.tokeniser import Lex, TokenKind, EOF_MAGIC, NONE
 
 
 def lex(code):

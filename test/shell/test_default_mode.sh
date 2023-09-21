@@ -23,7 +23,7 @@ Foo
 EOM
 )
 
-RESULT_NOTPIPE=$(python3 -m lpython 'print(LINE);' 2>&1)
+RESULT_NOTPIPE=$(python3 -m pysln 'print(LINE);' 2>&1)
 
 EXPECTED_ERROR="NameError: name 'LINE' is not defined"
 TEST_NOTPIPE=$(echo "$RESULT_NOTPIPE" | grep "$EXPECTED_ERROR")
@@ -41,7 +41,7 @@ then
     echo "FAIL" >> $SOCKET
 fi
 
-RESULT_PIPE=$(echo "Foo" | python3 -m lpython 'print(LINE);')
+RESULT_PIPE=$(echo "Foo" | python3 -m pysln 'print(LINE);')
 
 if [[ "$EXPECTED" != "$RESULT_PIPE" ]]
 then

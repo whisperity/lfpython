@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright (C) 2020 Whisperity
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -16,29 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SOCKET="$1"
+from py_singleline.py_singleline import main as real_main
 
-EXPECTED=$(cat <<-EOM
-Foo
-$(bash --version)
-EOM
-)
-
-RESULT=$(python3 -m pysln -t bare -X "Foo" -X "$(bash --version)" \
-    'print(ARGS[1]); print(ARGS[2])')
-
-if [[ "$EXPECTED" != "$RESULT" ]]
-then
-    echo "[ERROR] Received output:" >&2
-    echo "----------------------------------------" >&2
-    echo -e "$RESULT" >&2
-    echo "----------------------------------------" >&2
-    echo "Does NOT match expected output:" >&2
-    echo "----------------------------------------" >&2
-    echo -e "$EXPECTED" >&2
-    echo "----------------------------------------" >&2
-
-    echo "FAIL" >> $SOCKET
-fi
-
-echo "OK" >> $SOCKET
+def main(argv=None):
+    """Wrapper entry point for the 'pysln' command-line tool."""
+    return real_main(argv)

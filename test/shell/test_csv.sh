@@ -34,7 +34,7 @@ EOM
 
 SCRIPT='for idx, elem in enumerate(ROW): if not HEADER(): ROW[idx] = int(elem) * 10; endif; endfor'
 
-RESULT=$(echo "$INPUT" | python3 -m lpython -t csv "${SCRIPT}" | tr -d '\r')
+RESULT=$(echo "$INPUT" | python3 -m pysln -t csv "${SCRIPT}" | tr -d '\r')
 
 if [[ "$EXPECTED" != "$RESULT" ]]
 then

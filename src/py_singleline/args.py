@@ -31,11 +31,11 @@ def default_mode():
 
 
 args = argparse.ArgumentParser(
-        prog="lpython",
-        description="Rewrite Python scripts written in a linear code fashion "
+        prog="pysln",
+        description="Rewrite Python scripts written as a single line "
                     "to real Python scripts, and execute them for quick & "
-                    "dirty shell pipeline operations.",
-        epilog="Linear Python scripts differ from real Python in a few "
+                    "dirty Shell pipeline operations.",
+        epilog="Single-line Python scripts differ from real Python in a few "
                "crucial ways. First, there is no need to handle indentation, "
                "because it is meant to be written in one line like a shell "
                "command. Second, there is no need for newlines, as the "
@@ -98,4 +98,4 @@ args.add_argument("-X",
 
 args.add_argument("CODE",
                   nargs="*",
-                  help="The LPython code to transpile and execute.")
+                  help="The single-line code to transpile and execute.")

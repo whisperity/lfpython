@@ -54,14 +54,14 @@ except OSError:
 
 
 setup(
-    name="lpython",
-    description="Linearly written Python scripts in a pipeline",
+    name="py-singleline",
+    description="Arbitrarily complex single-line Python scripts",
     version=version,
     author="Whisperity",
     author_email="whisperity-packages@protonmail.com",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url="http://github.com/whisperity/lpython",
+    url="http://github.com/whisperity/py-singleline",
     license="GPLv3+",
     keywords="python shell pipeline script scripting",
     classifiers=[
@@ -81,16 +81,18 @@ setup(
         ],
     python_requires=">=3.6",
 
-    packages=["lpython",
-              "lpython.modes"
+    packages=["py_singleline",
+              "py_singleline.modes",
+              "pysln"
               ],
     package_dir={
-        "lpython": "src/lpython"
+        "py_singleline": "src/py_singleline",
+        "pysln": "src/pysln"
         },
 
     entry_points={
         "console_scripts": [
-            "lpython=lpython.lpython:main"
+            "pysln=pysln.pysln:main"
             ]
         }
 )
